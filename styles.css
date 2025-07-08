@@ -40,26 +40,44 @@ header {
 }
 
 .logo-text {
-  font-size: 1.5rem; 
-  color: var(--dark); 
+  font-size: 1.5rem;
+  color: #a10013;
   font-weight: 700;
-  white-space: nowrap; 
+  white-space: nowrap;
   position: relative;
+  display: inline-block;
 }
 
-.logo-text span {
+.logo-text span:not(.ar) {
+  display: inline-block; /* Ensures smooth opacity transitions */
+}
+
+.logo-text span.highlight {
   color: var(--primary);
 }
 
 @keyframes fadeInOut {
-  0%, 100% { opacity: 0; }
-  50% { opacity: 1; }
+  0% { opacity: 0; }
+  15% { opacity: 1; }  /* Faster fade-in */
+  75% { opacity: 1; }  /* Holds longer (60% of the cycle) */
+  100% { opacity: 0; } /* Faster fade-out */
+}
+
+@keyframes fadeOutIn {
+  0% { opacity: 1; }
+  15% { opacity: 0; }  /* Fades out as .ar fades in */
+  75% { opacity: 0; }  /* Stays hidden while .ar is visible */
+  100% { opacity: 1; } /* Fades back in as .ar disappears */
 }
 
 .logo-text .ar {
   position: absolute;
   left: 0;
-  animation: fadeInOut 4s infinite;
+  animation: fadeInOut 8s infinite ease-in-out; /* Slower cycle (8s) */
+}
+
+.logo-text .default-text {
+  animation: fadeOutIn 8s infinite ease-in-out; /* Sync with .ar */
 }
 
 nav { 
@@ -310,7 +328,7 @@ section {
 }
 
 .testimonials {
-  background-color: #f8fafc;
+  background-color: #fcf8f8;
   padding: 5rem 5%;
 }
 
