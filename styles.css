@@ -1,9 +1,9 @@
 :root {
-  --primary: #a10013;        /* Dark red */
-  --primary-dark: #80000e;   /* Darker red */
-  --secondary: #6b7280;      /* Keeping the same gray */
-  --dark: #111827;           /* Keeping the same dark */
-  --light: #f9fafb;          /* Keeping the same light */
+  --primary: #4285F4;        /* New friendly blue */
+  --primary-dark: #3367D6;   /* Darker blue */
+  --secondary: #5F6368;      /* Neutral gray */
+  --dark: #111827;           /* Keep as is */
+  --light: #f9fafb;          /* Keep as is */
 }
 
 html, body { 
@@ -41,26 +41,29 @@ header {
 
 .logo-text {
   font-size: 1.5rem;
-  color: #a10013;
   font-weight: 700;
   white-space: nowrap;
   position: relative;
   display: inline-block;
+  height: 1.5em; /* Prevents layout shift */
+  overflow: hidden;
 }
 
-.logo-text span:not(.ar) {
-  display: inline-block; /* Ensures smooth opacity transitions */
+.logo-text .english-text,
+.logo-text .arabic-text {
+  position: absolute;
+  animation: fadeInOut 8s infinite ease-in-out;
 }
 
-.logo-text span.highlight {
-  color: var(--primary);
+.logo-text .arabic-text {
+  animation-delay: 4s; /* Perfect alternation */
 }
 
 @keyframes fadeInOut {
   0% { opacity: 0; }
-  15% { opacity: 1; }  /* Faster fade-in */
-  75% { opacity: 1; }  /* Holds longer (60% of the cycle) */
-  100% { opacity: 0; } /* Faster fade-out */
+  25% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 @keyframes fadeOutIn {
@@ -104,6 +107,17 @@ nav {
   z-index: 1; 
   border-radius: 0.5rem; 
   padding: 0.5rem 0;
+  right: 0;
+  left: auto; /* Prevents left-side overflow */
+  min-width: max-content;
+}
+
+@media (max-width: 768px) {
+  .dropdown-content {
+    position: fixed;
+    width: 100vw;
+    left: 0 !important;
+  }
 }
 
 .dropdown-content a { 
