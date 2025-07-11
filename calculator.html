@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Fees Calculator</title>
+    <style>
+        :root {
+            --primary: #4285F4;
+            --primary-dark: #3367D6;
+            --secondary: #5F6368;
+            --dark: #111827;
+            --light: #f9fafb;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: var(--primary-dark);
+            margin-bottom: 30px;
+        }
+        
+        .calculator {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            background-color: white;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        #reset-btn {
+            background-color: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        #reset-btn:hover {
+            background-color: #f0f5ff;
+        }
+        
+        #calculate-btn {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        #calculate-btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        #result {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #f0f5ff;
+            border-left: 4px solid var(--primary);
+            border-radius: 4px;
+            display: none;
+        }
+        
+        #result h3 {
+            color: var(--primary-dark);
+            margin-top: 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .total-row {
+            font-weight: bold;
+            background-color: #e6f2ff !important;
+        }
+        
+        .grand-total-row {
+            font-weight: bold;
+            background-color: #d4e6ff !important;
+            font-size: 1.1em;
+        }
+        
+        .note {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #fff8e6;
+            border-left: 3px solid #ffc107;
+            font-style: italic;
+        }
+        
+        .children-row {
+            font-weight: bold;
+            background-color: #f0f5ff !important;
+        }
+        
+        .error {
+            color: #d32f2f;
+            margin-top: 10px;
+        }
+        
+        .optional {
+            color: var(--secondary);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>Service Fees Calculator</h1>
+    <div class="calculator">
+        <div class="form-group">
+            <label for="service-type">Select the Service</label>
+            <select id="service-type">
+                <option value="">-- Select Service --</option>
+                <option value="family-visa">Family Visa</option>
+                <option value="employment-visa">Employment Visa</option>
+                <option value="visit-visa">Visit Visa</option>
+                <option value="student-visa">Student Visa</option>
+                <option value="investor-visa">Investor Visa</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="sub-service">Choose the Service</label>
+            <select id="sub-service">
+                <option value="">-- Select Sub Service --</option>
+                <option value="new-application">New Visa</option>
+                <option value="renewal">Renewal</option>
+                <option value="cancellation">Cancellation</option>
+                <option value="status-change">Status Change</option>
+                <option value="transfer">Transfer</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="emirate">Which Emirates of Sponsor</label>
+            <select id="emirate">
+                <option value="abudhabi" selected>Abu Dhabi</option>
+                <option value="dubai">Dubai</option>
+                <option value="sharjah">Sharjah</option>
+                <option value="ajman">Ajman</option>
+                <option value="ummalquwain">Umm Al Quwain</option>
+                <option value="rasalkhaimah">Ras Al Khaimah</option>
+                <option value="fujairah">Fujairah</option>
+            </select>
+        </div>
+
+        <div class="form-group hidden" id="children-group">
+            <label for="children">Number of Children</label>
+            <input type="number" id="children" min="0" value="0">
+        </div>
+
+        <div class="form-group hidden" id="visa-type-group">
+            <label for="visa-type">Sponsor Visa Type</label>
+            <select id="visa-type">
+                <option value="">-- Select Visa Type --</option>
+                <option value="employment">Employment Visa</option>
+                <option value="investor">Investor Visa</option>
+                <option value="family">Family Visa</option>
+                <option value="student">Student Visa</option>
+            </select>
+        </div>
+
+        <div class="form-group hidden" id="optional-fees-group">
+            <label>
+                <input type="checkbox" id="include-file-open"> Include File Open (AED 400)
+            </label>
+            <label>
+                <input type="checkbox" id="include-tenancy"> Include Tenancy (AED 600)
+            </label>
+        </div>
+
+        <div class="form-group">
+            <label for="location">Location</label>
+            <select id="location">
+                <option value="">-- Select Location --</option>
+                <option value="inside">Inside Country</option>
+                <option value="outside">Outside Country</option>
+                <option value="freezone">Free Zone</option>
+            </select>
+        </div>
+
+        <div class="button-group">
+            <button id="reset-btn">Reset</button>
+            <button id="calculate-btn">Calculate Fees</button>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calculateBtn = document.getElementById('calculate-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const resultDiv = document.getElementById('result');
+            const serviceTypeSelect = document.getElementById('service-type');
+            const childrenGroup = document.getElementById('children-group');
+            const visaTypeGroup = document.getElementById('visa-type-group');
+            const visaTypeSelect = document.getElementById('visa-type');
+            const optionalFeesGroup = document.getElementById('optional-fees-group');
+            
+            // Fee structure with all visa data
+            const feeStructure = {
+                'family-visa': {
+                    'new-application': {
+                        'abudhabi': {
+                            'family': {
+                                'inside': {
+                                    visa: 420,
+                                    changeStatus: 720,
+                                    idIqama: 870,
+                                    fileOpen: 400,
+                                    tenancy: 600,
+                                    total: function(includeFileOpen, includeTenancy) {
+                                        let total = this.visa + this.changeStatus + this.idIqama;
+                                        if (includeFileOpen) total += this.fileOpen;
+                                        if (includeTenancy) total += this.tenancy;
+                                        return total;
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    'renewal': {
+                        'abudhabi': {
+                            'family': {
+                                'inside': {
+                                    idIqama: 870,
+                                    total: function() {
+                                        return this.idIqama;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                'employment-visa': {
+                    // ... (keep existing employment visa structure) ...
+                }
+            };
+
+            // Show/hide fields based on service type selection
+            serviceTypeSelect.addEventListener('change', function() {
+                const selectedService = this.value;
+                
+                if (selectedService === 'family-visa') {
+                    childrenGroup.classList.remove('hidden');
+                    visaTypeGroup.classList.remove('hidden');
+                    optionalFeesGroup.classList.remove('hidden');
+                    // Automatically set visa type to "family" when family visa is selected
+                    visaTypeSelect.value = 'family';
+                } else {
+                    childrenGroup.classList.add('hidden');
+                    optionalFeesGroup.classList.add('hidden');
+                    document.getElementById('children').value = 0;
+                    
+                    if (selectedService === 'employment-visa') {
+                        visaTypeGroup.classList.remove('hidden');
+                    } else {
+                        visaTypeGroup.classList.add('hidden');
+                        visaTypeSelect.selectedIndex = 0;
+                    }
+                }
+            });
+
+            calculateBtn.addEventListener('click', function() {
+                const serviceType = document.getElementById('service-type').value;
+                const subService = document.getElementById('sub-service').value;
+                const emirate = document.getElementById('emirate').value;
+                const children = parseInt(document.getElementById('children').value) || 0;
+                const visaType = document.getElementById('visa-type').value;
+                const location = document.getElementById('location').value;
+                const includeFileOpen = document.getElementById('include-file-open').checked;
+                const includeTenancy = document.getElementById('include-tenancy').checked;
+
+                // Clear previous result
+                resultDiv.style.display = 'none';
+                
+                // Validate all required fields
+                if (!serviceType || !subService || !emirate || !location) {
+                    showError('Please fill in all required fields');
+                    return;
+                }
+
+                // Additional validation for visa type
+                if ((serviceType === 'employment-visa' || serviceType === 'family-visa') && !visaType) {
+                    showError('Please select sponsor visa type');
+                    return;
+                }
+
+                try {
+                    // Check if the combination exists in our fee structure
+                    if (!feeStructure[serviceType] || 
+                        !feeStructure[serviceType][subService] || 
+                        !feeStructure[serviceType][subService][emirate] || 
+                        !feeStructure[serviceType][subService][emirate][visaType] || 
+                        !feeStructure[serviceType][subService][emirate][visaType][location]) {
+                        throw new Error('Combination not found');
+                    }
+
+                    const fees = feeStructure[serviceType][subService][emirate][visaType][location];
+                    let grandTotal = 0;
+                    let resultHTML = '<h3>Fee Calculation Result</h3>';
+                    
+                    resultHTML += `
+                        <p><strong>Service:</strong> ${document.getElementById('service-type').options[document.getElementById('service-type').selectedIndex].text} - ${document.getElementById('sub-service').options[document.getElementById('sub-service').selectedIndex].text}</p>
+                        <p><strong>Emirate:</strong> ${document.getElementById('emirate').options[document.getElementById('emirate').selectedIndex].text}</p>`;
+                    
+                    if (serviceType === 'family-visa') {
+                        resultHTML += `<p><strong>Number of Children:</strong> ${children}</p>`;
+                    }
+                    
+                    resultHTML += `<table>
+                                <tr>
+                                    <th>Fee Type</th>
+                                    <th>Amount (AED)</th>
+                                </tr>`;
+                    
+                    // Family Visa specific display
+                    if (serviceType === 'family-visa') {
+                        if (subService === 'new-application') {
+                            // Show optional fees only if selected
+                            if (includeFileOpen) {
+                                resultHTML += `
+                                    <tr>
+                                        <td>File Open <span class="optional">(optional)</span></td>
+                                        <td>${fees.fileOpen}</td>
+                                    </tr>`;
+                            }
+                            if (includeTenancy) {
+                                resultHTML += `
+                                    <tr>
+                                        <td>Tenancy <span class="optional">(optional)</span></td>
+                                        <td>${fees.tenancy}</td>
+                                    </tr>`;
+                            }
+                            
+                            resultHTML += `
+                                <tr>
+                                    <td>Visa</td>
+                                    <td>${fees.visa}</td>
+                                </tr>
+                                <tr>
+                                    <td>Change Status</td>
+                                    <td>${fees.changeStatus}</td>
+                                </tr>
+                                <tr>
+                                    <td>ID & Iqama</td>
+                                    <td>${fees.idIqama}</td>
+                                </tr>`;
+                            
+                            // Calculate base total (1 person)
+                            const baseTotal = fees.total(includeFileOpen, includeTenancy);
+                            // Children count as normal (same fees as 1 person)
+                            const childrenTotal = children * baseTotal;
+                            grandTotal = baseTotal + childrenTotal;
+                            
+                            resultHTML += `
+                                <tr class="total-row">
+                                    <td>Total Fees (1 Person)</td>
+                                    <td>${baseTotal.toLocaleString()}</td>
+                                </tr>`;
+                            
+                            if (children > 0) {
+                                resultHTML += `
+                                    <tr class="children-row">
+                                        <td>Children Fees (${children} persons × ${baseTotal})</td>
+                                        <td>${childrenTotal.toLocaleString()}</td>
+                                    </tr>`;
+                            }
+                        } else {
+                            // Renewal case
+                            const baseTotal = fees.total();
+                            const childrenTotal = children * baseTotal;
+                            grandTotal = baseTotal + childrenTotal;
+                            
+                            resultHTML += `
+                                <tr>
+                                    <td>ID & Iqama</td>
+                                    <td>${fees.idIqama}</td>
+                                </tr>
+                                <tr class="total-row">
+                                    <td>Total Fees (1 Person)</td>
+                                    <td>${baseTotal.toLocaleString()}</td>
+                                </tr>`;
+                            
+                            if (children > 0) {
+                                resultHTML += `
+                                    <tr class="children-row">
+                                        <td>Children Fees (${children} persons × ${baseTotal})</td>
+                                        <td>${childrenTotal.toLocaleString()}</td>
+                                    </tr>`;
+                            }
+                        }
+                    }
+                    // Employment Visa specific display
+                    else if (serviceType === 'employment-visa') {
+                        // ... (keep existing employment visa display logic) ...
+                    }
+                    
+                    // Add grand total row for all cases
+                    resultHTML += `
+                                <tr class="grand-total-row">
+                                    <td>Grand Total</td>
+                                    <td>${grandTotal.toLocaleString()}</td>
+                                </tr>
+                            </table>
+                            <div class="note">
+                                Note: All amounts include VAT and our service fees. No extra charges will be added.
+                            </div>`;
+                    
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = resultHTML;
+                    
+                    // Scroll to result
+                    resultDiv.scrollIntoView({ behavior: 'smooth' });
+                } catch (error) {
+                    showError('Fee information not available for the selected combination. Please try different options.');
+                }
+            });
+
+            function showError(message) {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `<p class="error">${message}</p>`;
+                resultDiv.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            resetBtn.addEventListener('click', function() {
+                document.getElementById('service-type').selectedIndex = 0;
+                document.getElementById('sub-service').selectedIndex = 0;
+                document.getElementById('emirate').selectedIndex = 0;
+                document.getElementById('children').value = 0;
+                document.getElementById('visa-type').selectedIndex = 0;
+                document.getElementById('location').selectedIndex = 0;
+                document.getElementById('include-file-open').checked = false;
+                document.getElementById('include-tenancy').checked = false;
+                childrenGroup.classList.add('hidden');
+                visaTypeGroup.classList.add('hidden');
+                optionalFeesGroup.classList.add('hidden');
+                resultDiv.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
